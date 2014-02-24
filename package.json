@@ -11,5 +11,9 @@
   "repository": {
     "type": "git",
     "url": "https://github.com/anvaka/ngraph.vivasvg"
+  },
+  "dependencies": {
+    "ngraph.merge": "0.0.1",
+    "ngraph.forcelayout": "0.0.8"
   }
 }
