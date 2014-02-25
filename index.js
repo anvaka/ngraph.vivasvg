@@ -31,11 +31,19 @@ module.exports = function (graph, settings) {
     },
 
     nodeTemplate: function (template) {
-      createNodeUI = svgCompiler(template);
+      var createMarkup = svgCompiler(template);
+      var NodeUI = require('./lib/nodeUI');
+
+      createNodeUI = function (node) {
+        var markup= createMarkup(node);
+        var transform = svgScene.root.createSVGTransform();
+        var pos = layout.getNodePosition(node.id);
+        return new NodeUI(markup, transform, pos);
+      };
     },
 
     linkTemplate: function (template) {
-
+      //createLinkUI = svgCompiler(template);
     },
 
     scene: svgScene
@@ -76,11 +84,14 @@ module.exports = function (graph, settings) {
   }
 
   function removeNode(node) {
-
   }
 
   function addLink(link) {
-
+    /*
+    var ui = createLinkUI(link);
+    ui.pos = layout.getNodePosition(link.fromId);
+    svgScene.addElement(ui);
+    */
   }
 
   function removeLink(node) {
