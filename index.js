@@ -15,6 +15,10 @@ module.exports = function (graph, settings) {
   var disposed = false;
   var sceneInitialized = false;
   var svgCompiler = require('./lib/svgCompiler');
+  var extensions = {
+    arrow: require('./lib/arrow')
+  };
+
   var createNodeUI, createLinkUI;
 
   return {
@@ -35,7 +39,7 @@ module.exports = function (graph, settings) {
       var NodeUI = require('./lib/nodeUI');
 
       createNodeUI = function (node) {
-        var markup= createMarkup(node);
+        var markup = createMarkup(node);
         var transform = svgScene.root.createSVGTransform();
         var pos = layout.getNodePosition(node.id);
         return new NodeUI(markup, transform, pos);
@@ -43,7 +47,7 @@ module.exports = function (graph, settings) {
     },
 
     linkTemplate: function (template) {
-      //createLinkUI = svgCompiler(template);
+      createLinkUI = svgCompiler(template, extensions);
     },
 
     scene: svgScene
@@ -87,11 +91,18 @@ module.exports = function (graph, settings) {
   }
 
   function addLink(link) {
-    /*
     var ui = createLinkUI(link);
-    ui.pos = layout.getNodePosition(link.fromId);
-    svgScene.addElement(ui);
-    */
+    var linkPosition = layout.getLinkPosition(link.id);
+    svgScene.addElement({
+      render: function () {
+        for (var i = 0; i < ui.controls.length; ++i) {
+          ui.controls[i].render(linkPosition);
+        }
+      },
+      append: function (root) {
+        root.appendChild(ui.element);
+      }
+    });
   }
 
   function removeLink(node) {
