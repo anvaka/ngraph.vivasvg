@@ -11,15 +11,8 @@ module.exports = function (graph, settings) {
   });
 
   var layout = getDefaultLayout();
-  var svgScene = require('./lib/svgScene')(settings.container, layout);
   var disposed = false;
   var sceneInitialized = false;
-  var svgCompiler = require('./lib/svgCompiler');
-  var extensions = {
-    arrow: require('./lib/arrow')
-  };
-
-  var createNodeUI, createLinkUI;
 
   return {
     run: animationLoop,
@@ -35,35 +28,23 @@ module.exports = function (graph, settings) {
     },
 
     nodeTemplate: function (template) {
-      var createMarkup = svgCompiler(template);
-      var NodeUI = require('./lib/nodeUI');
-
-      createNodeUI = function (node) {
-        var markup = createMarkup(node);
-        var transform = svgScene.root.createSVGTransform();
-        var pos = layout.getNodePosition(node.id);
-        return new NodeUI(markup, transform, pos);
-      };
     },
 
     linkTemplate: function (template) {
-      createLinkUI = svgCompiler(template, extensions);
     },
 
     scene: svgScene
   };
 
   function animationLoop() {
-    if (disposed) return;
-    if (!sceneInitialized) initializeScene();
-
     requestAnimationFrame(animationLoop);
     layout.step(); // TODO: this should stop, when layout is stable
     renderOneFrame();
   }
 
   function renderOneFrame() {
-    svgScene.render();
+    if (disposed) return;
+    if (!sceneInitialized) initializeScene();
   }
 
   function getDefaultLayout() {
@@ -83,26 +64,12 @@ module.exports = function (graph, settings) {
   }
 
   function addNode(node) {
-    var ui = createNodeUI(node);
-    svgScene.addElement(ui);
   }
 
   function removeNode(node) {
   }
 
   function addLink(link) {
-    var ui = createLinkUI(link);
-    var linkPosition = layout.getLinkPosition(link.id);
-    svgScene.addElement({
-      render: function () {
-        for (var i = 0; i < ui.controls.length; ++i) {
-          ui.controls[i].render(linkPosition);
-        }
-      },
-      append: function (root) {
-        root.appendChild(ui.element);
-      }
-    });
   }
 
   function removeLink(node) {
@@ -133,5 +100,4 @@ module.exports = function (graph, settings) {
       }
     }
   }
-
 };
