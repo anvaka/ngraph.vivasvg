@@ -1,5 +1,7 @@
 module.exports = function (graph, settings) {
   var merge = require('ngraph.merge');
+  var vivasvg = require('vivasvg');
+
   settings = merge(settings, {
     physics: {
       springLength: 30,
@@ -10,9 +12,15 @@ module.exports = function (graph, settings) {
     }
   });
 
+  // todo: abstract this as scene
+  var svgDoc = new vivasvg.Document(settings.container || document.body);
+  var nodes = new vivasvg.Collection();
+  var edges = new vivasvg.Collection();
+
   var layout = getDefaultLayout();
   var disposed = false;
   var sceneInitialized = false;
+  var _nodeTemplate, _linkTemplate;
 
   return {
     run: animationLoop,
@@ -20,7 +28,6 @@ module.exports = function (graph, settings) {
     renderOneFrame: renderOneFrame,
 
     dispose: function () {
-      svgScene.dispose();
       layout.dispose();
       disposed = true;
 
@@ -28,12 +35,12 @@ module.exports = function (graph, settings) {
     },
 
     nodeTemplate: function (template) {
+      _nodeTemplate = template;
     },
 
     linkTemplate: function (template) {
-    },
-
-    scene: svgScene
+      _linkTemplate = template;
+    }
   };
 
   function animationLoop() {
@@ -45,6 +52,8 @@ module.exports = function (graph, settings) {
   function renderOneFrame() {
     if (disposed) return;
     if (!sceneInitialized) initializeScene();
+
+    svgDoc.render();
   }
 
   function getDefaultLayout() {
@@ -60,16 +69,28 @@ module.exports = function (graph, settings) {
     graph.forEachNode(addNode);
     graph.forEachLink(addLink);
 
+    var edgesUI = new vivasvg.ItemsControl();
+    edgesUI.setItemTemplate(_linkTemplate);
+    edgesUI.setItemSource(edges);
+    svgDoc.appendChild(edgesUI);
+
+    var nodesUI = new vivasvg.ItemsControl();
+    nodesUI.setItemTemplate(_nodeTemplate);
+    nodesUI.setItemSource(nodes);
+    svgDoc.appendChild(nodesUI);
+
     listenToGraphEvents(true);
   }
 
   function addNode(node) {
+    nodes.push(node);
   }
 
   function removeNode(node) {
   }
 
   function addLink(link) {
+    links.push(link);
   }
 
   function removeLink(node) {
