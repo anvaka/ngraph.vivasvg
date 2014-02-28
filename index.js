@@ -90,7 +90,7 @@ module.exports = function (graph, settings) {
   }
 
   function addLink(link) {
-    links.push(link);
+    edges.push(link);
   }
 
   function removeLink(node) {
