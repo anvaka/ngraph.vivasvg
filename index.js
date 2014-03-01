@@ -80,7 +80,7 @@ module.exports = function (graph, settings) {
     graph.forEachLink(addLink);
     var Zoomer = require('./lib/zoomer');
     var zoomer = new Zoomer();
-    zoomer.setZero(container.clientWidth/2, container.clientHeight/2);
+    zoomer.moveTo(container.clientWidth/2, container.clientHeight/2);
     svgDoc.appendChild(zoomer);
 
     var edgesUI = new vivasvg.ItemsControl();
