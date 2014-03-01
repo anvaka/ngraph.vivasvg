@@ -31,6 +31,7 @@ module.exports = function (graph, settings) {
 
     dispose: function () {
       layout.dispose();
+      svgDoc.dispose();
       disposed = true;
 
       listenToGraphEvents(false);
