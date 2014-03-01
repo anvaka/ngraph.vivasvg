@@ -1,6 +1,7 @@
 module.exports = function (graph, settings) {
   var merge = require('ngraph.merge');
   var vivasvg = require('vivasvg');
+  require('./lib/arrow');
 
   settings = merge(settings, {
     physics: {
@@ -54,10 +55,15 @@ module.exports = function (graph, settings) {
     if (disposed) return;
     if (!sceneInitialized) initializeScene();
     nodes.forEach(notifyNodePositionChange);
+    edges.forEach(notifyEdgePositionChange);
   }
 
   function notifyNodePositionChange(node) {
     node.fire('pos');
+  }
+
+  function notifyEdgePositionChange(edge) {
+    edge.fire('from');
   }
 
   function getDefaultLayout() {
@@ -102,7 +108,10 @@ module.exports = function (graph, settings) {
   }
 
   function addLink(link) {
-    edges.push(link);
+    edges.push(vivasvg.model({
+      pos: layout.getLinkPosition(link.id),
+      link: link
+    }));
   }
 
   function removeLink(node) {
