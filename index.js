@@ -13,9 +13,10 @@ module.exports = function (graph, settings) {
   });
 
   // todo: abstract this as scene
-  var svgDoc = new vivasvg.Document(settings.container || document.body);
-  var nodes = new vivasvg.Collection();
-  var edges = new vivasvg.Collection();
+  var container = settings.container || document.body;
+  var svgDoc = new vivasvg.Document(container);
+  var nodes = vivasvg.collection();
+  var edges = vivasvg.collection();
 
   var layout = getDefaultLayout();
   var disposed = false;
@@ -71,16 +72,20 @@ module.exports = function (graph, settings) {
 
     graph.forEachNode(addNode);
     graph.forEachLink(addLink);
+    var Zoomer = require('./lib/zoomer');
+    var zoomer = new Zoomer();
+    zoomer.setZero(container.clientWidth/2, container.clientHeight/2);
+    svgDoc.appendChild(zoomer);
 
     var edgesUI = new vivasvg.ItemsControl();
     edgesUI.setItemTemplate(_linkTemplate);
     edgesUI.setItemSource(edges);
-    svgDoc.appendChild(edgesUI);
+    zoomer.appendChild(edgesUI);
 
     var nodesUI = new vivasvg.ItemsControl();
     nodesUI.setItemTemplate('<g transform="translate({{pos.x}}, {{pos.y}})">' + _nodeTemplate + '</g>');
     nodesUI.setItemSource(nodes);
-    svgDoc.appendChild(nodesUI);
+    zoomer.appendChild(nodesUI);
 
     listenToGraphEvents(true);
   }
