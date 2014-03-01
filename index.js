@@ -52,8 +52,11 @@ module.exports = function (graph, settings) {
   function renderOneFrame() {
     if (disposed) return;
     if (!sceneInitialized) initializeScene();
+    nodes.forEach(notifyNodePositionChange);
+  }
 
-    svgDoc.render();
+  function notifyNodePositionChange(node) {
+    node.fire('pos');
   }
 
   function getDefaultLayout() {
@@ -75,7 +78,7 @@ module.exports = function (graph, settings) {
     svgDoc.appendChild(edgesUI);
 
     var nodesUI = new vivasvg.ItemsControl();
-    nodesUI.setItemTemplate(_nodeTemplate);
+    nodesUI.setItemTemplate('<g transform="translate({{pos.x}}, {{pos.y}})">' + _nodeTemplate + '</g>');
     nodesUI.setItemSource(nodes);
     svgDoc.appendChild(nodesUI);
 
@@ -83,7 +86,11 @@ module.exports = function (graph, settings) {
   }
 
   function addNode(node) {
-    nodes.push(node);
+    nodes.push(vivasvg.model({
+      pos: layout.getNodePosition(node.id),
+      id: node.id,
+      node: node
+    }));
   }
 
   function removeNode(node) {
