@@ -20,6 +20,7 @@ module.exports = function (graph, settings) {
   var edges = vivasvg.collection();
 
   var layout = getDefaultLayout();
+  var isStable = false;
   var disposed = false;
   var sceneInitialized = false;
   var _nodeTemplate, _linkTemplate;
@@ -48,15 +49,19 @@ module.exports = function (graph, settings) {
 
   function animationLoop() {
     requestAnimationFrame(animationLoop);
-    layout.step(); // TODO: this should stop, when layout is stable
+    if (!isStable) {
+      isStable = layout.step();
+    }
     renderOneFrame();
   }
 
   function renderOneFrame() {
     if (disposed) return;
     if (!sceneInitialized) initializeScene();
-    nodes.forEach(notifyNodePositionChange);
-    edges.forEach(notifyEdgePositionChange);
+    if (!isStable) {
+      nodes.forEach(notifyNodePositionChange);
+      edges.forEach(notifyEdgePositionChange);
+    }
   }
 
   function notifyNodePositionChange(node) {
@@ -116,7 +121,6 @@ module.exports = function (graph, settings) {
   }
 
   function removeLink(node) {
-
   }
 
   function listenToGraphEvents(isOn) {
@@ -124,6 +128,7 @@ module.exports = function (graph, settings) {
   }
 
   function onGraphChanged(changes) {
+    resetStable();
     for (var i = 0; i < changes.length; ++i) {
       var change = changes[i];
       if (change.changeType === 'add') {
@@ -142,5 +147,9 @@ module.exports = function (graph, settings) {
         }
       }
     }
+  }
+
+  function resetStable() {
+    isStable = false;
   }
 };
