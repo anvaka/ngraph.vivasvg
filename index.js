@@ -56,6 +56,7 @@ module.exports = function (graph, settings) {
   return api;
 
   function animationLoop() {
+    if (disposed) return;
     requestAnimationFrame(animationLoop);
     if (!isStable) {
       isStable = layout.step();
