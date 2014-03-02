@@ -116,15 +116,21 @@ module.exports = function (graph, settings) {
   }
 
   function onMouseUp(e) {
+    if (draggingNode) {
+      var node = draggingNode.node;
+      layout.pinNode(node, draggingNode.wasPinned);
+    }
     draggingNode = null;
   }
 
-  function onMouseDownNode(e, node) {
-    draggingNode = node;
-    layout.pinNode(node, true);
+  function onMouseDownNode(e, model) {
+    draggingNode = model;
+
+    draggingNode.wasPinned = layout.isNodePinned(model.node);
+    layout.pinNode(model.node, true);
     var pos = zoomer.getModelPosition(e.clientX, e.clientY);
-    dragNodeDx = pos.x - node.pos.x;
-    dragNodeDy = pos.y - node.pos.y;
+    dragNodeDx = pos.x - model.pos.x;
+    dragNodeDy = pos.y - model.pos.y;
     e.stopPropagation();
   }
 
@@ -133,7 +139,7 @@ module.exports = function (graph, settings) {
     resetStable();
 
     var pos = zoomer.getModelPosition(e.clientX, e.clientY);
-    layout.setNodePosition(draggingNode.id, pos.x, pos.y);
+    layout.setNodePosition(draggingNode.id, pos.x - dragNodeDx, pos.y - dragNodeDy);
     notifyNodePositionChange(draggingNode);
     e.stopPropagation();
     e.preventDefault();
