@@ -16,6 +16,7 @@ module.exports = function (graph, settings) {
   // todo: abstract this as scene
   var container = settings.container || document.body;
   var svgDoc = new vivasvg.Document(container);
+  var zoomer;
   var nodes = vivasvg.collection();
   var edges = vivasvg.collection();
 
@@ -24,6 +25,7 @@ module.exports = function (graph, settings) {
   var disposed = false;
   var sceneInitialized = false;
   var _nodeTemplate, _linkTemplate;
+  var draggingNode, dragNodeDx, dragNodeDy;
 
   return {
     run: animationLoop,
@@ -36,6 +38,7 @@ module.exports = function (graph, settings) {
       disposed = true;
 
       listenToGraphEvents(false);
+      listenToDomEvents(false);
     },
 
     nodeTemplate: function (template) {
@@ -85,7 +88,7 @@ module.exports = function (graph, settings) {
     graph.forEachNode(addNode);
     graph.forEachLink(addLink);
     var Zoomer = require('./lib/zoomer');
-    var zoomer = new Zoomer();
+    zoomer = new Zoomer();
     zoomer.moveTo(container.clientWidth/2, container.clientHeight/2);
     svgDoc.appendChild(zoomer);
 
@@ -95,19 +98,45 @@ module.exports = function (graph, settings) {
     zoomer.appendChild(edgesUI);
 
     var nodesUI = new vivasvg.ItemsControl();
-    nodesUI.setItemTemplate('<g transform="translate({{pos.x}}, {{pos.y}})">' + _nodeTemplate + '</g>');
+    nodesUI.setItemTemplate('<g transform="translate({{pos.x}}, {{pos.y}})" onmousedown="{{mousedown}}">' + _nodeTemplate + '</g>');
     nodesUI.setItemSource(nodes);
     zoomer.appendChild(nodesUI);
 
     listenToGraphEvents(true);
+    listenToDomEvents(true);
   }
 
   function addNode(node) {
     nodes.push(vivasvg.model({
       pos: layout.getNodePosition(node.id),
       id: node.id,
-      node: node
+      node: node,
+      mousedown: onMouseDownNode,
     }));
+  }
+
+  function onMouseUp(e) {
+    draggingNode = null;
+  }
+
+  function onMouseDownNode(e, node) {
+    draggingNode = node;
+    layout.pinNode(node, true);
+    var pos = zoomer.getModelPosition(e.clientX, e.clientY);
+    dragNodeDx = pos.x - node.pos.x;
+    dragNodeDy = pos.y - node.pos.y;
+    e.stopPropagation();
+  }
+
+  function onMouseMove(e) {
+    if (!draggingNode) return;
+    resetStable();
+
+    var pos = zoomer.getModelPosition(e.clientX, e.clientY);
+    layout.setNodePosition(draggingNode.id, pos.x, pos.y);
+    notifyNodePositionChange(draggingNode);
+    e.stopPropagation();
+    e.preventDefault();
   }
 
   function removeNode(node) {
@@ -125,6 +154,13 @@ module.exports = function (graph, settings) {
 
   function listenToGraphEvents(isOn) {
     graph[isOn ? 'on': 'off']('changed', onGraphChanged);
+  }
+
+  function listenToDomEvents(isOn) {
+    var visual = svgDoc.getVisual();
+    var method = isOn ? 'addEventListener' : 'removeEventListener';
+    visual[method]('mousemove', onMouseMove);
+    visual[method]('mouseup', onMouseUp);
   }
 
   function onGraphChanged(changes) {
