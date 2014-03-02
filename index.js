@@ -27,7 +27,7 @@ module.exports = function (graph, settings) {
   var _nodeTemplate, _linkTemplate;
   var draggingNode, dragNodeDx, dragNodeDy;
 
-  return {
+  var api = {
     run: animationLoop,
 
     renderOneFrame: renderOneFrame,
@@ -35,6 +35,7 @@ module.exports = function (graph, settings) {
     dispose: function () {
       layout.dispose();
       svgDoc.dispose();
+      api.off();
       disposed = true;
 
       listenToGraphEvents(false);
@@ -49,6 +50,10 @@ module.exports = function (graph, settings) {
       _linkTemplate = template;
     }
   };
+
+  require('ngraph.events')(api);
+
+  return api;
 
   function animationLoop() {
     requestAnimationFrame(animationLoop);
@@ -132,6 +137,7 @@ module.exports = function (graph, settings) {
     dragNodeDx = pos.x - model.pos.x;
     dragNodeDy = pos.y - model.pos.y;
     e.stopPropagation();
+    api.fire('nodeSelected', model.node);
   }
 
   function onMouseMove(e) {
