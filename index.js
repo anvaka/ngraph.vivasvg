@@ -29,8 +29,8 @@ module.exports = function (graph, settings) {
 
   var api = {
     run: animationLoop,
-
     renderOneFrame: renderOneFrame,
+    layout: layout,
 
     dispose: function () {
       layout.dispose();
