@@ -59,18 +59,16 @@ module.exports = function (graph, settings) {
     if (disposed) return;
     requestAnimationFrame(animationLoop);
     if (!isStable) {
-      isStable = layout.step();
+      nowStable = layout.step();
+      renderOneFrame();
     }
-    renderOneFrame();
   }
 
   function renderOneFrame() {
     if (disposed) return;
     if (!sceneInitialized) initializeScene();
-    if (!isStable) {
-      nodes.forEach(notifyNodePositionChange);
-      edges.forEach(notifyEdgePositionChange);
-    }
+    nodes.forEach(notifyNodePositionChange);
+    edges.forEach(notifyEdgePositionChange);
   }
 
   function notifyNodePositionChange(node) {
