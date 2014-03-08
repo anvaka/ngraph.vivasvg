@@ -1,6 +1,6 @@
 {
   "name": "ngraph.vivasvg",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "Simple SVG based graph renderer",
   "main": "index.js",
   "scripts": {
@@ -16,7 +16,8 @@
     "ngraph.merge": "0.0.1",
     "ngraph.forcelayout": "0.0.8",
     "ngraph.events": "0.0.2",
-    "vivasvg": "0.0.0",
-    "wheel": "0.0.0"
+    "wheel": "0.0.0",
+    "ngraph.physics.simulator": "0.0.6",
+    "vivasvg": "0.0.1"
   }
 }
