@@ -1,8 +1,8 @@
-module.exports = function (graph, settings) {
-  var merge = require('ngraph.merge');
-  var vivasvg = require('vivasvg');
-  require('./lib/arrow');
+require('./lib/arrow');
+var merge = require('ngraph.merge');
+var vivasvg = require('vivasvg');
 
+module.exports = function (graph, settings) {
   settings = merge(settings, {
     physics: {
       springLength: 30,
