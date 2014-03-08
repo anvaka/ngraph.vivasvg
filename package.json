@@ -1,6 +1,6 @@
 {
   "name": "ngraph.vivasvg",
-  "version": "0.0.0",
+  "version": "0.0.1",
   "description": "Simple SVG based graph renderer",
   "main": "index.js",
   "scripts": {
