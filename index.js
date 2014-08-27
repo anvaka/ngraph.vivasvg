@@ -2,7 +2,7 @@ require('./lib/arrow');
 var merge = require('ngraph.merge');
 var vivasvg = require('vivasvg');
 
-module.exports = function (graph, settings) {
+module.exports = function(graph, settings) {
   settings = merge(settings, {
     physics: {
       springLength: 30,
@@ -32,7 +32,7 @@ module.exports = function (graph, settings) {
     renderOneFrame: renderOneFrame,
     layout: layout,
 
-    dispose: function () {
+    dispose: function() {
       layout.dispose();
       svgDoc.dispose();
       api.off();
@@ -42,11 +42,11 @@ module.exports = function (graph, settings) {
       listenToDomEvents(false);
     },
 
-    nodeTemplate: function (template) {
+    nodeTemplate: function(template) {
       _nodeTemplate = template;
     },
 
-    linkTemplate: function (template) {
+    linkTemplate: function(template) {
       _linkTemplate = template;
     }
   };
@@ -93,7 +93,7 @@ module.exports = function (graph, settings) {
     graph.forEachLink(addLink);
     var Zoomer = require('./lib/zoomer');
     zoomer = new Zoomer();
-    zoomer.moveTo(container.clientWidth/2, container.clientHeight/2);
+    zoomer.moveTo(container.clientWidth / 2, container.clientHeight / 2);
     svgDoc.appendChild(zoomer);
 
     var edgesUI = new vivasvg.ItemsControl();
@@ -150,8 +150,7 @@ module.exports = function (graph, settings) {
     e.preventDefault();
   }
 
-  function removeNode(node) {
-  }
+  function removeNode(node) {}
 
   function addLink(link) {
     edges.push(vivasvg.model({
@@ -160,11 +159,10 @@ module.exports = function (graph, settings) {
     }));
   }
 
-  function removeLink(node) {
-  }
+  function removeLink(node) {}
 
   function listenToGraphEvents(isOn) {
-    graph[isOn ? 'on': 'off']('changed', onGraphChanged);
+    graph[isOn ? 'on' : 'off']('changed', onGraphChanged);
   }
 
   function listenToDomEvents(isOn) {
